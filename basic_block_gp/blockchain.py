@@ -31,13 +31,22 @@ class Blockchain(object):
         """
 
         block = {
-            # TODO
+            'index': len(self.chain) + 1,
+            'timestamp': time(),
+            'transactions': self.current_transactions,
+            'proof': proof,
+            'previous_hash': previous_hash or self.hash(self.last_block) # Or 'previous_hash': self.hash(self.chain[-1])
+
+
+
         }
 
         # Reset the current list of transactions
-        # Append the chain to the block
+        self.current_transactions = []
+        # Append the block to the chain
+        self.chain.append(block)
         # Return the new block
-        pass
+        return block
 
     def hash(self, block):
         """
@@ -48,12 +57,20 @@ class Blockchain(object):
         """
 
         # Use json.dumps to convert json into a string
+        string_block = json.dumps(block, sort_keys= True)#sort_keys= True is a flag makes sure all of the keys in the dictionary
+        # are turned into a string in A - Z order,
+        # if the order changed so would the hash every time we ran the function and we don't want that
+
         # Use hashlib.sha256 to create a hash
         # It requires a `bytes-like` object, which is what
         # .encode() does.
+        raw_hash = hashlib.sha256(string_block.encode())
+
+
         # It converts the Python string into a byte string.
         # We must make sure that the Dictionary is Ordered,
         # or we'll have inconsistent hashes
+
 
         # TODO: Create the block_string
 
@@ -64,9 +81,9 @@ class Blockchain(object):
         # This can be hard to read, but .hexdigest() converts the
         # hash to a string of hexadecimal characters, which is
         # easier to work with and understand
-
+        hex_hash = raw_hash.hexdigest()
         # TODO: Return the hashed block string in hexadecimal format
-        pass
+        return hex_hash
 
     @property
     def last_block(self):
@@ -87,7 +104,7 @@ class Blockchain(object):
     @staticmethod
     def valid_proof(block_string, proof):
         """
-        Validates the Proof:  Does hash(block_string, proof) contain 3
+        Validates the Proof:  Does hash(block_string + proof) contain 3
         leading zeroes?  Return true if the proof is valid
         :param block_string: <string> The stringified block to use to
         check in combination with `proof`
@@ -127,6 +144,8 @@ def mine():
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
+       'chain': blockchain.chain,
+        'length': len(blockchain.chain)
         # TODO: Return the chain and its current length
     }
     return jsonify(response), 200
