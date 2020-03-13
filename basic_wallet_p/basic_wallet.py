@@ -1,6 +1,6 @@
 import json
 #Just like the adventure game, terminal selection
-
+#Not doing it in android/kotlin as it was too difficult for me, this needs work though
 def main():
     data = load_data()
     if "id" not in data:
